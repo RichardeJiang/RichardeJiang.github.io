@@ -4,7 +4,6 @@ title:  "A Note on Python List"
 date:   2016-10-19 13:44:00 +0800
 categories: jekyll update
 ---
-This is actually a test-put of the `_posts` folder.
 
 Created by Richard Jiang on 19th, Oct, 2016. 
 
