@@ -29,7 +29,9 @@ def XmlParsing(targetFile, targetTag):
 {% endhighlight %}
 
 I'm not sure anyone has spotted the problem or not; nonetheless, let's check out this line:
+
 `print "The file causing the error is: ", fileName`
+
 Where is this `fileName`?
 
 I spotted the error as from the printed out messages, it seems that only one file is problematic, and the program hangs there. I even tried removing that particular file, but soon noticed that another file is behaving the same way! Eventually I came to this `fileName`.
@@ -55,7 +57,9 @@ if __name__ == "__main__":
 {% endhighlight %}
 
 If the above reasoning holds, then it can be inferred that the output is:
+
 `the file name is thirdOne`
+
 And indeed it is.
 
 When we are accustomed to Python's indentation style, it's just intuitive to take the code with the same number of tabs (okay spaces are also there, you win) as the same 'level', so 'why can a variable like fileName be held outside the main function?'
