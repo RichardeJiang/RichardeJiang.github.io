@@ -1,0 +1,101 @@
+---
+layout: post
+title:  "Convolutional Neural Networks I: Intuition from CV"
+date:   2017-12-15 15:43:00 +0800
+categories: jekyll update
+---
+
+Created by Richard Jiang on 15th, Dec, 2017. 
+
+This blog was drafted 2 weeks earlier, yet it didn't come up until recently; I guess it's because of the end-of-year-and-happy-2017 series of events lol. Nevertheless, let's get started.
+
+So the first semester in which I was TA for a module offcially ended. It is true that time arrangement has been way more flexible compared to undergrad studies, and has hence given some benefits, for example, my friend and I got the chance to sit-in for more advanced, yet quite related course: the CS5242: Neural Networks and Deep Learning (for free, of course). 
+
+The course reminds me of the famous Stanford CS231n: Convolutional Neural Networks for Visual Recognition. And it turns out that we have to refer to the materials from CS231n quite a lot of times along the way just in order to understand sth. It was a bit troublesome at the beginning of our sit-in course, though, as sometimes the explanation from the lecturer is not clear enough. It is during this look-up time that I realize that I just cannot find a simple, clear, and intuitive guide on CNN on the Internet; yeah there are plenty of them, probably more than sufficient, but from my own perspective, they are either too wordy or too sophisticated (or too "cool", because of all the formulas). Therefore, I have decided to write on this set of tutorials.
+
+It all came together when I saw the process of 'convolution': a sliding window with numbers inside, appearing on the screen; it instantly took me back to the time of CS4243: Computer Vision and Pattern Recognition by Prof. Ng (seriously, to me one of the most interesting modules in CS department together with CS3217, and it kinda gave me the incentive to pursue a higher degree in related fields). 
+
+To begin with this set of tutorials, I'd like to discuss about one of the fundamental concepts in CV: edge detection. Consider the image below: the black and grey areas are separated by the line in between. 
+
+![edge](./assets/images/edge.png){:class="img-responsive"}
+
+Now let's use 1 and 0 to represent the pixel density from an image for simplicity. It is pretty clear that the columns of 1's and 0's have formed a line of 'separation'; in other words, an edge. 
+
+
+
+follows the pattern from the Stanford CS231n: 
+
+Accidentally captured this point from a seeming bug.
+
+All starts from the XML file parsing task. Currently what I have in hand is the collection of the ACM Periodical Data (which means all coneferences papers, etc), in XML format, and my main text mining job launched from here. As some of the XML files are relatively out-dated, the format might not be rigorous enough for the parser (I'm using the *minidom* lib) to understand, so I got this for processing:
+
+{% highlight Python %}
+def XmlParsing(targetFile, targetTag):
+	try:
+		DOMTree = xml.dom.minidom.parse(targetFile)
+	except xml.parsers.expat.ExpatError, e:
+		print "The file causing the error is: ", fileName
+		print "The detailed error is: %s" %e
+	else:
+		collection = DOMTree.documentElement
+
+		resultList = collection.getElementsByTagName(targetTag)
+		return resultList
+
+	return "ERROR"
+
+{% endhighlight %}
+
+I'm not sure anyone has spotted the problem or not; nonetheless, let's check out this line:
+
+`print "The file causing the error is: ", fileName`
+
+Where is this `fileName`?
+
+I spotted the error as from the printed out messages, it seems that only one file is problematic, and the program hangs there. I even tried removing that particular file, but soon noticed that another file is behaving the same way! Eventually I came to this `fileName`.
+
+But shouldn't it be showing compilation error? Why is the code able to run without any error?
+
+So, let's consider the snippet below:
+
+{% highlight Python %}
+def write():
+	print "the file name is %s" % fileName
+	return
+
+if __name__ == "__main__":
+	print "We define fileName first"
+	ele = "acc1002.xml"
+	a=["firstOne", "secondOne", "thirdOne"]
+	for fileName in a:
+	        ele = fileName
+	print "Now in the main function, calling write()"
+	write()
+
+{% endhighlight %}
+
+If the above reasoning holds, then it can be inferred that the output is:
+
+`the file name is thirdOne`
+
+And indeed it is.
+
+When we are accustomed to Python's indentation style, it's just intuitive to take the code with the same number of tabs (okay spaces are also there, you win) as the same 'level', so 'why can a variable like fileName be held outside the main function?'
+
+And there is just no such `main` function.
+
+The above code is same when you write sth like this:
+
+{% highlight Python %}
+def write():
+	print "the file name is %s" % fileName
+	return
+
+
+print "We define fileName first"
+ele = "acc1002.xml"
+...
+
+{% endhighlight %}
+
+And therefore, the lesson to take here is: in Python script, the code outside all the functions is the top level, and you are actually declaring variables which are global. Then of course they can be used inside those functions of lower hierarchies.
