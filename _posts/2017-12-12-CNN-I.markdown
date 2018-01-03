@@ -17,7 +17,7 @@ It all came together when I saw the process of 'convolution': a sliding window w
 
 To begin with this set of tutorials, I'd like to discuss about one of the fundamental concepts in CV: edge detection. Consider the image below: the black and grey areas are separated by the line in between. 
 
-![edge]({{richardejiang.github.io}}/assets/images/edge.png){:class="img-inblog"}
+![edge]({{richardejiang.github.io}}/assets/images/edge.png){:id="img-edge"}
 
 Now let's use 1 and 0 to represent the pixel density from an image for simplicity. It is pretty clear that the columns of 1's and 0's have formed a line of 'separation'; in other words, an edge. 
 
