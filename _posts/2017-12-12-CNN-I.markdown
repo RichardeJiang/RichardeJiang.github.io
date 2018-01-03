@@ -19,83 +19,39 @@ To begin with this set of tutorials, I'd like to discuss about one of the fundam
 
 ![edge]({{richardejiang.github.io}}/assets/images/edge.png){:id="img-edge"}
 
-Now let's use 1 and 0 to represent the pixel density from an image for simplicity. It is pretty clear that the columns of 1's and 0's have formed a line of 'separation'; in other words, an edge. 
+Now let's use 1 and 0 to represent the pixel density (or color, if this makes more sense to you) from an image for simplicity. The idea is that we want to use numbers to replace the raw colors such that later we can see the picture from the computer's point of view. It is pretty clear that the columns of 1's and 0's have formed a line of 'separation'; in other words, a vertical edge. 
+
+![number]({{richardejiang.github.io}}/assets/images/number.png){:id="img-edge"}
+
+With the numbers inside, now let's see the matrix listed below. You may treat it as a filter:
+
+![number]({{richardejiang.github.io}}/assets/images/filter.png){:id="img-edge"}
+
+Now the trick: let's slide the filter through the matrix of the image, for any pixel of the image, let's replace its original value with the following: do an element-wise product of the filter with the current 3x3 matrix it's covering inside the image, and then sum all the products up, like this:
+
+![number]({{richardejiang.github.io}}/assets/images/conv.png){:id="img-edge"}
+
+After replacement, the original image will become like this:
+
+![number]({{richardejiang.github.io}}/assets/images/detected.png){:id="img-edge"}
+
+Refer back to our definition for the values, you can see that now the new image has only information regarding the central edge, and all the rest (where the color remains constant) is weakened to 0. If you convert the numbers back to the real pixel RGB color, it's not hard to guess that the new image will have a shining vertical white line in the middle, with the rest set to black color.
+
+So this is the trick we can do with a simple 3x3 matrix; in fact, the filter we've just used is officially the [Prewitt Edge Detector][prewitt]. Notice that you may also put the filter in its transpose so it cna detect the horizontal edge.
+
+Okay that's the CS usage of filters, but how about this 'convolution' concept?
+
+The idea of convolution, to me, starts from my EE course with signal processing and all that Fourier Transform stuff. The official definition of convolution, as can be found on Wikipedia, is:
+
+![number]({{richardejiang.github.io}}/assets/images/convolution.png){:id="img-edge"}
+
+When performing the Fourier transform, the domain is switched from one to the other, and can be regarded as the element-wise product-and-sum. Well, it sounds like what we did just now with the images, right? 
+
+Now back to the images: if you think about it in a higher level, just now in the raw image, the edge we detected is actually a **feature** of it. If we have many of such filters, it is totally possible for us to recognize/detect/extract the important features out of it, for instance, a U-shape curve or sth. Sometimes when you are recognizing sth, you are simply identifying whether there are such features inside the images, aren't you?
+
+So is the neural network.
+
+And with these concepts and intuitions from CV, we have seen that there are sth useful we can extarct from the numerical representation of images, and these things can be used to represent/stand for the raw images. The process of 'convolution' is hence introduced, and we have seen how it can be beneficial to simplify the images. With all the simple features, a neural network cna then be studied on how to utilize them better. So I'll end the introduction here, and in the next few posts, I'll show a more detailed explanation on Convolutional Neural Networks.
 
 
-
-follows the pattern from the Stanford CS231n: 
-
-Accidentally captured this point from a seeming bug.
-
-All starts from the XML file parsing task. Currently what I have in hand is the collection of the ACM Periodical Data (which means all coneferences papers, etc), in XML format, and my main text mining job launched from here. As some of the XML files are relatively out-dated, the format might not be rigorous enough for the parser (I'm using the *minidom* lib) to understand, so I got this for processing:
-
-{% highlight Python %}
-def XmlParsing(targetFile, targetTag):
-	try:
-		DOMTree = xml.dom.minidom.parse(targetFile)
-	except xml.parsers.expat.ExpatError, e:
-		print "The file causing the error is: ", fileName
-		print "The detailed error is: %s" %e
-	else:
-		collection = DOMTree.documentElement
-
-		resultList = collection.getElementsByTagName(targetTag)
-		return resultList
-
-	return "ERROR"
-
-{% endhighlight %}
-
-I'm not sure anyone has spotted the problem or not; nonetheless, let's check out this line:
-
-`print "The file causing the error is: ", fileName`
-
-Where is this `fileName`?
-
-I spotted the error as from the printed out messages, it seems that only one file is problematic, and the program hangs there. I even tried removing that particular file, but soon noticed that another file is behaving the same way! Eventually I came to this `fileName`.
-
-But shouldn't it be showing compilation error? Why is the code able to run without any error?
-
-So, let's consider the snippet below:
-
-{% highlight Python %}
-def write():
-	print "the file name is %s" % fileName
-	return
-
-if __name__ == "__main__":
-	print "We define fileName first"
-	ele = "acc1002.xml"
-	a=["firstOne", "secondOne", "thirdOne"]
-	for fileName in a:
-	        ele = fileName
-	print "Now in the main function, calling write()"
-	write()
-
-{% endhighlight %}
-
-If the above reasoning holds, then it can be inferred that the output is:
-
-`the file name is thirdOne`
-
-And indeed it is.
-
-When we are accustomed to Python's indentation style, it's just intuitive to take the code with the same number of tabs (okay spaces are also there, you win) as the same 'level', so 'why can a variable like fileName be held outside the main function?'
-
-And there is just no such `main` function.
-
-The above code is same when you write sth like this:
-
-{% highlight Python %}
-def write():
-	print "the file name is %s" % fileName
-	return
-
-
-print "We define fileName first"
-ele = "acc1002.xml"
-...
-
-{% endhighlight %}
-
-And therefore, the lesson to take here is: in Python script, the code outside all the functions is the top level, and you are actually declaring variables which are global. Then of course they can be used inside those functions of lower hierarchies.
+[prewitt]: https://en.wikipedia.org/wiki/Prewitt_operator
