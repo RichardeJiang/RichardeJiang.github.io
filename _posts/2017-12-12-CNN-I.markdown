@@ -37,7 +37,7 @@ After replacement, the original image will become like this:
 
 Refer back to our definition for the values, you can see that now the new image has only information regarding the central edge, and all the rest (where the color remains constant) is weakened to 0. If you convert the numbers back to the real pixel RGB color, it's not hard to guess that the new image will have a shining vertical white line in the middle, with the rest set to black color.
 
-So this is the trick we can do with a simple 3x3 matrix; in fact, the filter we've just used is officially the [Prewitt Edge Detector][prewitt]. Notice that you may also put the filter in its transpose so it cna detect the horizontal edge.
+So this is the trick we can do with a simple 3x3 matrix; in fact, the filter we've just used is officially the [Prewitt Edge Detector][prewitt]. Notice that you may also put the filter in its transpose so it can detect the horizontal edge.
 
 Okay that's the CS usage of filters, but how about this 'convolution' concept?
 
@@ -51,7 +51,7 @@ Now back to the images: if you think about it in a higher level, just now in the
 
 So is the neural network.
 
-And with these concepts and intuitions from CV, we have seen that there are sth useful we can extarct from the numerical representation of images, and these things can be used to represent/stand for the raw images. The process of 'convolution' is hence introduced, and we have seen how it can be beneficial to simplify the images. With all the simple features, a neural network cna then be studied on how to utilize them better. So I'll end the introduction here, and in the next few posts, I'll show a more detailed explanation on Convolutional Neural Networks.
+And with these concepts and intuitions from CV, we have seen that there are sth useful we can extarct from the numerical representation of images, and these things can be used to represent/stand for the raw images. The process of 'convolution' is hence introduced, and we have seen how it can be beneficial to simplify the images. With all the simple features, a neural network can then be studied on how to utilize them better. So I'll end the introduction here, and in the next few posts, I'll show a more detailed explanation on Convolutional Neural Networks.
 
 
 [prewitt]: https://en.wikipedia.org/wiki/Prewitt_operator
