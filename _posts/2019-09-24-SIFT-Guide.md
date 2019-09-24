@@ -43,5 +43,18 @@ Ok so why do we need this? Remember we want to find the **projection** onto each
 So now you have the basic idea on the concepts. In the code for this part, since it's an inner product, where it's essentially **element-wise multiplication and summation**. Does this sound familiar? You will find nn.Conv2d useful here, and remember we want to project the gradient vector onto directions, so you may convolve xxx with xxx... (I'll leave the rest to you otherwise it'll be like giving away the answer.)
 
 ## Histogram
-So what we want is 
+So what we want is calculating the contribution to each of the sub-regions (the figure on the Szelinski book is clearer for the idea behind this, refer to Figure 4.18 on page 224). What have done so far? Every pixel there are 8 values for 8 directions, and we want to calculate **which direction is this pixel contributing the most**? And the original gradient value of the pixel will be marked for the magnitude of its direction vector. Hence the most straightforward logic is to loop, loop, and loop:
+{% highlight Python %} 
+for row:
+    for column:
+        for each of the 8 directions:
+            if this is the direction I'm contributing the most, mark the magnitude
+{% endhighlight %} 
+
+But as you can image this will take forever to run; that's why you can find in the comment section that this kind of impl will be penalized. So think about how to speed it up. A quick hint: in np you can do things like:
+{% highlight Python %} 
+a = np.array([1,2,3,4,5])
+idx = np.array([0,2])
+print(a[idx]) # this will give you [1, 3]
+{% endhighlight %} 
 
