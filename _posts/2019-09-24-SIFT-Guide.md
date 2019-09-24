@@ -19,7 +19,7 @@ All of this starts with the idea of image gradients: the layer you have implemen
 {% endhighlight %} 
 is actualy telling you a **feature** about this pixel and the current image patch. So for each of the pixels in your image, there is this set of values: how much I'm changing in x, and y directions. 
 
-Now consider a patch of pixels, say 8x8, then everyone of the 64 pixels has an Ix and Iy, and if we think about Ix and Iy as **vector magnitudes**, then we can say things like: for pixel a, it is mainly pointing towards the direction of Ix*u+Iy*v, where u and v represent the unit vector in x and y axis; what does this mean? How much does the gradient contribute to x and y directions, right? And the contribution is essentially the **projection onto the x and y axis** On the other hand, if our coordinate system consists of 8 directions/axis, we could do similar things like projecting the gradient vector onto these 8 directions and see **which direction this vector is contributing the most**. 
+Now consider a patch of pixels, say 8x8, then everyone of the 64 pixels has an Ix and Iy, and if we think about Ix and Iy as **vector magnitudes**, then we can say things like: for pixel a, it is mainly pointing towards the direction of Ix \times u + Iy \times v, where u and v represent the unit vector in x and y axis; what does this mean? How much does the gradient contribute to x and y directions, right? And the contribution is essentially the **projection onto the x and y axis** On the other hand, if our coordinate system consists of 8 directions/axis, we could do similar things like projecting the gradient vector onto these 8 directions and see **which direction this vector is contributing the most**. 
 
 If we divide the 8x8 patch to 4 sub-regions (4x4 each), then for every sub-region, we should be able to tell one idea: on direction 1, how much contribution I received from this sub-region in total, on direction 2 how much contribution, etc ... and the end result is u0 = [v0, v1, v2, ..., v7]  (meaning for sub-region u0), and concatenating u0, u1, u2, u3, we have a thing called SIFT feature descriptor.
 
@@ -48,7 +48,8 @@ So what we want is calculating the contribution to each of the sub-regions (the 
 for row:
     for column:
         for each of the 8 directions:
-            if this is the direction I'm contributing the most, mark the magnitude
+            if this is the direction I'm contributing the most: 
+                mark the magnitude
 {% endhighlight %} 
 
 But as you can image this will take forever to run; that's why you can find in the comment section that this kind of impl will be penalized. So think about how to speed it up. A quick hint: in np you can do things like:
