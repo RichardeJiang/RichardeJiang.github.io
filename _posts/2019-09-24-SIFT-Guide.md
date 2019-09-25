@@ -25,9 +25,9 @@ If we divide the 8x8 patch to 4 sub-regions (4x4 each), then for every sub-regio
 
 Why does this work as a feature? Well, let's consider the following mini-example (sorry for the bad drawing; here are 2 windows):
 
-![window]({{richardejiang.github.io}}/assets/images/windows.jpeg){:id="windows"}
+![window]({{richardejiang.github.io}}/assets/images/doors.jpeg){:id="windows"}
 
-So the orange shape represents the window, and red squares mean the 4 sub-regions, and suppose the blue vectors give the most contributing directions of this patch. Then if we concatenate the 4 vectors together from the left image, we can tell that for a window, we end up with a descriptor where the first region direction is pointing to top-left, second pointing to top-right, etc... Let's say we take an image of the window from another angle (the image on the right), although the directions may differ a little. bit, but the concatenated vectors are similar right?
+So the orange shape represents a door (the left and right images mean we take the images of the door from different angles), and red squares mean the 6 sub-regions, and suppose the blue vectors give the most contributing directions of this patch. Then if we concatenate the 6 vectors together from the left image, we can tell that for a door, we end up with a descriptor where the first region direction is pointing to top-left, second pointing to top-right, etc... Let's say we take an image of the door from another angle (the image on the right), although the directions may differ a little bit, but the concatenated vectors are similar right?
 
 ## SIFT Orientation
 Ok so get down to impl. We say we have 8 directions, and we want to find out how the gradient vector is contributing to each of them. How to do it? Well as the comment suggests, "projection". Essentially you are projecting the vector onto each of the direction vectors, and consider first: how to get the 8 direction vectors? 
