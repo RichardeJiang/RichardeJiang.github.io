@@ -35,9 +35,9 @@ If we divide the 8x8 patch to 4 sub-regions (4x4 each), then for every sub-regio
 
 Why does this work as a feature? Well, let's consider the following mini-example (sorry for the bad drawing; here are 2 windows):
 
-![window]({{richardejiang.github.io}}/assets/images/windows.jpeg){:id="windows"}
+![window]({{richardejiang.github.io}}/assets/images/doors.jpeg){:id="windows"}
 
-So the orange shape represents the window, and red squares mean the 4 sub-regions, and suppose the blue vectors give the most contributing directions of this patch. Then if we concatenate the 4 vectors together from the left image, we can tell that for a window, we end up with a descriptor where the first region direction is pointing to top-left, second pointing to top-right, etc... Let's say we take an image of the window from another angle (the image on the right), although the directions may differ a little. bit, but the concatenated vectors are similar right?
+So the orange shape represents a door (the left and right images mean we take the images of the door from different angles), and red squares mean the 6 sub-regions, and suppose the blue vectors give the most contributing directions of this patch. Then if we concatenate the 6 vectors together from the left image, we can tell that for a door, we end up with a descriptor where the first region direction is pointing to top-left, second pointing to top-right, etc... Let's say we take an image of the door from another angle (the image on the right), although the directions may differ a little bit, but the concatenated vectors are similar right?
 
 
 You should already have computed keypoints with your Harris Corner detector (red circle below). Now, you'll seek to describe this keypoint with a ``descriptor''. The SIFT descriptor will combine information about local neighborhoods in a 16x16 patch around the keypoint. In total, you'll seek to find 8 numbers to describe each of 16 neighborhoods, giving you $$16 \times 8=128$$ numbers. We'll flatten these into a 128-dimensional vector.
