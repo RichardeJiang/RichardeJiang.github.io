@@ -6,7 +6,7 @@ categories: jekyll update
 mathjax: true
 ---
 
-Created by Richard Jiang on 24th, Sept, 2019. 
+Created by Shenhao Jiang and John Lambert on 24th, Sept, 2019. 
 
 Having received a ton of questions on "what is going on?" and "how do I start?" during the office hours and on Piazza, I'll try explaining the basic concepts of SIFT here and also provide some guide on approaches to start building the network. Also, I'll try my best to incorporate some hints on how you can use PyTorch to achieve the goals. I decided to work on this tutorial just 10 min ago, so bear with me for some of the wordings :-)
 
@@ -65,7 +65,7 @@ Ok so why do we need this? Remember we want to find the **projection** onto each
 So now you have the basic idea on the concepts. In the code for this part, since it's an inner product, where it's essentially **element-wise multiplication and summation**. Does this sound familiar? You will find nn.Conv2d useful here, and remember we want to project the gradient vector onto directions, so you may convolve xxx with xxx... (I'll leave the rest to you otherwise it'll be like giving away the answer.)
 
 ## Histogram
-So what we want is calculating the contribution to each of the sub-regions (the figure on the Szeliski book is clearer for the idea behind this, refer to Figure 4.18 on page 224). What have done so far? At every pixel ,there are 8 values for 8 directions, and we want to calculate **to which direction is this pixel contributing the most**? And the original gradient value of the pixel will be marked for the magnitude of its direction vector. 
+So what we want is calculating the contribution to each of the sub-regions (the figure on the Szeliski book is clearer for the idea behind this, refer to Figure 4.18 on page 224). What have we done so far? At every pixel, there are 8 values for 8 directions, and we want to calculate **to which direction is this pixel contributing the most**? And we'd like to assign the weight to these directions based on the magnitude of the pixel's gradient. Check out the following figure (note that in the histogram sample, we have 8 "bins", which correspond to what we've computed using projection in the previous section): 
 
 <div class="fig figcenter fighighlight">
   <img src="https://johnwlambert.github.io/assets/unweighted_weighted_histogram.png" width="85%">
