@@ -20,20 +20,21 @@ All of this starts with the idea of image gradients: the layer you have implemen
   </div>
 </div>
 
-It turns out that an easy way to compute a central difference at each pixel is to convolve the image with a filter like
+It turns out that an easy way to compute an $$x$$ partial derivative (by central difference) at each pixel is to convolve the image with a filter like
 {% highlight Python %} 
-[[1,0,-1],
+K = [
+ [1,0,-1],
  [2,0,-2],
  [1,0,-1]
 ] 
 {% endhighlight %} 
-You'll end up with a **feature** of this pixel, derived from info in the local image patch. So for each of the pixels in your image, there is this set of values: how much I'm changing in x, and y directions.
+You'll end up with a **feature** of this pixel, derived from info in the local image patch. So for each of the pixels in your image, there is this set of values: how much I'm changing in $$x$$ and $$y$$ directions.
 
-Now consider a patch of pixels, say 8x8, then everyone of the 64 pixels has an $$I_x$$ and $$I_y$$, and if we think about $$I_x$$ and $$I_y$$ as **vector magnitudes**, then we can say things like: for pixel a, it is mainly pointing towards the direction of $$I_x \times u + I_y \times v$$, where $$u$$ and $$v$$ represent the unit vector in $$x$$ and $$y$$ axis; what does this mean? How much does the gradient contribute to x and y directions, right? And the contribution is essentially the **projection onto the x and y axis**. On the other hand, if our coordinate system consists of 8 directions/axes, we could do similar things like projecting the gradient vector onto these 8 directions and see **which direction this vector is contributing the most**. 
+Now consider a patch of pixels, say 8x8, then every one of the 64 pixels has an $$I_x$$ and $$I_y$$, and if we think about $$I_x$$ and $$I_y$$ as forming a **vector magnitude**, then we can say things like: for pixel a, it is mainly pointing towards the direction of $$I_x \times u + I_y \times v$$, where $$u$$ and $$v$$ represent the unit vectors in $$x$$ and $$y$$ directions; what does this mean? How much does the gradient contribute to $$x$$ and $$y$$ directions, right? And the contribution is essentially the **projection onto the x and y axes**. On the other hand, if our coordinate system consists of 8 directions/axes, we could do similar things like projecting the gradient vector onto these 8 directions and see **which direction this vector is contributing the most**. 
 
-If we divide the 8x8 patch to 4 sub-regions (4x4 each), then for every sub-region, we should be able to tell one idea: on direction 1, how much contribution I received from this sub-region in total, on direction 2 how much contribution, etc ... and the end result is $$u_0 = [v_0, v_1, v_2, ..., v_7]$$  (meaning for sub-region $$u_0$$), and concatenating $$u_0, u_1, u_2, u_3$$, we have a thing called SIFT feature descriptor.
+If we divide the 8x8 patch to 4 sub-regions (4x4 each), then for every sub-region, we should be able to tell one idea: on direction 1, how much contribution I received from this sub-region in total, on direction 2 how much contribution, etc ... and the end result is $$u_0 = [v_0, v_1, v_2, ..., v_7]$$  (meaning for sub-region $$u_0$$), and concatenating $$u_0, u_1, u_2, u_3$$ for 4 subregions/subgrids, we have a thing called a SIFT feature descriptor.
 
-Why does this work as a feature? Well, let's consider the following mini-example (sorry for the bad drawing; here are 2 windows):
+Why does this work as a feature? Well, let's consider the following mini-example (sorry for the bad drawing; here are 2 doors):
 
 ![window]({{richardejiang.github.io}}/assets/images/doors.jpeg){:id="windows"}
 
@@ -50,11 +51,11 @@ You should already have computed keypoints with your Harris Corner detector (red
 
 
 ## SIFT Orientation
-Ok so get down to impl. We say we have 8 directions, and we want to find out how the gradient vector is contributing to each of them. How to do it? Well as the comment suggests, "projection". Essentially you are projecting the vector onto each of the direction vectors, and consider first: how to get the 8 direction vectors? 
+Ok so get down to impl. We say we have 8 directions, and we want to find out how the gradient vector is contributing to each of them. How to do it? Well as the comment suggests, "projection". Essentially you are projecting the vector onto each of the direction vectors, and consider first: how can we determine the 8 direction vectors? 
 
 ![window]({{richardejiang.github.io}}/assets/images/directions.jpeg){:id="windows"}
 
-We want to span the directions uniformlly, so you know the angle theta, then how do you represent the vector? Simple right?
+We want to span the directions uniformlly, so you know the angle $$\theta$$, then how do you represent the vector? Simple right?
 
 Ok so why do we need this? Remember we want to find the **projection** onto each of these direction vectors, and a projection is relevant to inner product right?
 
@@ -64,12 +65,12 @@ Ok so why do we need this? Remember we want to find the **projection** onto each
 So now you have the basic idea on the concepts. In the code for this part, since it's an inner product, where it's essentially **element-wise multiplication and summation**. Does this sound familiar? You will find nn.Conv2d useful here, and remember we want to project the gradient vector onto directions, so you may convolve xxx with xxx... (I'll leave the rest to you otherwise it'll be like giving away the answer.)
 
 ## Histogram
-So what we want is calculating the contribution to each of the sub-regions (the figure on the Szeliski book is clearer for the idea behind this, refer to Figure 4.18 on page 224). What have done so far? Every pixel there are 8 values for 8 directions, and we want to calculate **which direction is this pixel contributing the most**? And the original gradient value of the pixel will be marked for the magnitude of its direction vector. 
+So what we want is calculating the contribution to each of the sub-regions (the figure on the Szeliski book is clearer for the idea behind this, refer to Figure 4.18 on page 224). What have done so far? At every pixel ,there are 8 values for 8 directions, and we want to calculate **to which direction is this pixel contributing the most**? And the original gradient value of the pixel will be marked for the magnitude of its direction vector. 
 
 <div class="fig figcenter fighighlight">
   <img src="https://johnwlambert.github.io/assets/unweighted_weighted_histogram.png" width="85%">
   <div class="figcaption">
-    SIFT uses **weighted histograms**, rather than unweighted ones.
+    Note that SIFT uses **weighted histograms**, rather than unweighted ones. If it was an unweighted histogram, we would just count how many pixels fell into each orientation bin (or more precisely, for each pixel, increment the corresponding orientation bin by one if its gradient vector's orientation fell into that bin).
   </div>
 </div>
 
@@ -79,8 +80,8 @@ To find the descriptor at every pixel, we could loop over the 16x16 patch around
 {% highlight Python %} 
 for row:
   for column:
-    for i in 4 neighborhoods of sz 4x4:
-      for j in 4 neighborhoods of sz 4x4:
+    for i= 0,1,2,3 for 4 neighborhoods of sz 4x4:
+      for j= 0,1,2,3 for 4 neighborhoods of sz 4x4:
         for ii of 4x4 subgrid:
           for jj of 4x4 subgrid:
             for each of the 8 directions:
@@ -90,8 +91,9 @@ for row:
 
 Notice that in Numpy the last line (marking the magnitude i.e. computing weighted histograms) is easy:
 ```python
-hist_vector, _ = np.histogram(angles, bins=8, range=(-np.pi, np.pi), weights=magnitudes)
+hist_vec, _ = np.histogram(angles, bins=8, range=(-np.pi, np.pi), weights=magnitudes)
 ```
+if your orientations were all in the range $$[-\pi, \pi]$$, which $$tan^{-1}(y,x) = \theta$$ gives you.
 
 With 7 for-loops, this code is going to run forever. We need something much faster.
 
@@ -105,17 +107,17 @@ for row:
   for column:
     for each of the 8 directions:
       if this is the direction Im contributing the most: 
-        mark the magnitude
+        mark the magnitude in a per-pixel histogram
 
 for row:
   for column:
     neighborhood_histogram = zeros(8,1)
-      for i = 0,1,2,3:
-        for j= 0,1,2,3:
-          neighborhood_histogram += per_pixel_histogram[row+i,column+j]
+    for i = 0,1,2,3 bc subgrid of sz 4x4:
+      for j= 0,1,2,3 bc subgrid of sz 4x4:
+        neighborhood_histogram += per_pixel_histogram[row+i,column+j]
 {% endhighlight %} 
 
-But as you can imagine, with 3 for-loops this will still take quite long to run; that's why you can find in the comment section that this kind of implementation will be penalized. 
+But as you can imagine, with 3 for-loops (and then 4 for-loops) this will still take quite long to run; that's why you can find in the comment section that this kind of implementation will be penalized. 
 
 ## Even Faster Code
 
